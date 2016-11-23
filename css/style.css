@@ -84,7 +84,7 @@ video {
     margin: 0;
     padding: 0;
     border: 0;
-    font-family: "Microsoft YaHei";
+    font-family: "Arial", "SimSun";
 }
 
 
@@ -253,6 +253,16 @@ a:hover, a:focus {
     border-radius: 5px;
 }
 
+.am-btn-success {
+    color: #fff;
+    background-color: #ee3a43;
+    border-color: #ee3a43;
+}
+
+.am-btn-success:hover, .am-btn-success:focus {
+    background-color: #ee3a43;
+    border-color: #ee3a43;
+}
 
 /*header结束*/
 
@@ -334,7 +344,7 @@ a:hover, a:focus {
 }
 
 .slogan {
-	margin: 30px auto 10px;
+	margin: 30px auto 40px;
 	width: 100%;
 	text-align: center;
 
@@ -346,13 +356,13 @@ a:hover, a:focus {
 .clearfix:after {clear: both;content: ' ';display: block;font-size: 0;line-height: 0;visibility: hidden;width: 0;height: 0;}
 
 dt + dd {
-	margin: 0 !important;
+	margin-top: 0 !important;
 }
 dd + dt {
-     margin: 0 !important; 
+     margin-top: 0 !important; 
 }
 
-.contect{ padding: 30px 0 40px 0; width:100%; margin: 0 auto;}
+.contect{ width:100%; margin: 0 auto;}
 .ab_flsnr{ 
 	background: #fff;
 	font-family: "微软雅黑" !important;
@@ -435,11 +445,10 @@ dd + dt {
 .he_tab .he_td1 img{ width: 100%;}
 .he_ys1{ background: #ededed;}
 .he_v1{ width: 85%; margin-left: 7.5%;}
-.he_p1{ font-size:16px; margin-bottom: 60px;}
-.he_dl1{ margin-bottom: 25px;}
+.he_p1{ font-size:16px; margin-bottom: 40px;}
+.he_dl1{ margin-bottom: 45px;}
 .he_dl1 dt{ float: left;}
 .he_dl1 dt img{ width: 100%;}
-.he_pd15{ padding-top: 10px;}
 .he_dl1 dd{ float: left; width: 62%; margin-left: 3%; font-size:19px; line-height: 150%;}
 .he_p2{ background: url(../img/he_dian.png) no-repeat left 10px; padding-left: 15px; line-height: 160%; margin-top: 15px; font-size: 14px;}
 
@@ -491,7 +500,6 @@ dd + dt {
 /*核心竞争开始*/
 .he_dl1 dd{ font-size: 20px; font-weight: bold;}
 .he_dl1 .im1{ width: 120px;}
-.he_pd15{ padding-top: 15px;}
 .he_p2{ font-size: 14px; margin-top: 10px;}
 .he_dl1 .im2{ width: 130px;}
 .he_dl1 .im3{ width: 66px;}
