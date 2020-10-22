@@ -10,6 +10,10 @@ li {
   font-family: electronicFont;
   src: url(../font/DS-DIGIT.TTF);
 }
+@font-face {
+  font-family: dinRegular;
+  src: url(../font/DIN-Regular.otf);
+}
 body {
   background: url(../images//bg.jpg) no-repeat top center;
   line-height: 1.15;
@@ -160,7 +164,9 @@ header .show-time {
   font-size: 0.875rem;
   color: #ffeb7b;
   text-align: center;
-  font-family: electronicFont;
+  /* font-family: electronicFont; */
+  font-family: dinRegular,"Microsoft YaHei",sans-serif;
+  font-weight: bold;
 }
 .no .no-hd ul li:first-child::after {
   content: '';

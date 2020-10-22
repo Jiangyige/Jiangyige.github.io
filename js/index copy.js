@@ -1,21 +1,8 @@
 // 立即执行函数，防止变量污染 (function() {})();
 
 // 是否是雅诗兰黛旗下店铺
-// 默认为否
-var isYSLD = false;
-
-function getQueryVariable(variable){
-  let query = window.location.search.substring(1);
-  let vars = query.split("&");
-  for (let i=0;i<vars.length;i++) {
-          let pair = vars[i].split("=");
-          if(pair[0] == variable){return pair[1];}
-  }
-  return(false);
-}
-console.log(getQueryVariable("isYSLD"));
-
-isYSLD = getQueryVariable("isYSLD") === 'true';
+var isYSLD = true;
+isYSLD = false;
 
 var ysldShops = [
   'mac魅可官方旗舰店',
@@ -30,16 +17,466 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
 
 // 全局方法
 (function() {
-  // 时间
-  setInterval(function(){
+  setInterval(() => {
     var time = moment().format('[当前时间：]YYYY[年]MM[月]DD[日 ]HH[时]mm[分]ss[秒]');
     $('.show-time').text(time);
   }, 1000);
+})();
 
-  // 避免卡顿 每5分钟刷新一次
-  setInterval(function() {
-    window.location.reload();
-  }, 5 * 1000 * 60);
+
+// 订单来源
+(function () {
+  // 1.实例化对象
+  var myChart = echarts.init(document.querySelector(".bar .chart"));
+  // 2.指定配置项和数据
+  
+
+
+  // 排行数据
+
+  var rankData = [];
+
+
+  var playInterval = 500;
+  var unit = {
+    '0': '',
+    '1': '万',
+    '2': '亿',
+    '3': '兆'
+  };
+
+  // 千分位
+  function formatNum(strNum) {
+    if (Math.round(strNum) <= 10 && strNum.length <= 3) {
+        return strNum;
+    }
+    u0 = 0
+    while (Math.round(strNum) > 1000000 && u0 < 3) {
+        strNum = Math.round(Math.round(strNum) / 10000);
+        u0 = u0 + 1
+    }
+
+    if (!/^(\+|-)?(\d+)(\.\d+)?$/.test(strNum)) {
+        return strNum;
+    }
+    var a = RegExp.$1,
+        b = RegExp.$2,
+        c = RegExp.$3;
+    var re = new RegExp();
+    re.compile("(\\d)(\\d{3})(,|$)");
+    while (re.test(b)) {
+        b = b.replace(re, "$1,$2$3");
+    }
+    return a + "" + b + "" + c + unit[String(u0)];
+  }
+
+  // 排行颜色
+  // var colorListS1 = [];
+  // var colors = []
+  // for (var i = 0; i < rankData.length; i++) {
+  //   var colorListF1 = {};
+  //   for (var n = 0; n < rankData[i].data.length; n++) {
+  //       var name = rankData[i].data[n].name;
+  //       colorListF1[name] = colors[n];
+  //   }
+  //   colorListS1[i] = colorListF1;
+  // }
+
+  // 基础设置
+  var option = {
+    baseOption: {
+        animationDurationUpdate: playInterval * 2,
+        animationEasingUpdate: 'quinticInOut',
+        timeline: {
+            show: false,
+            axisType: 'category',
+            orient: 'vertical',
+            autoPlay: true,
+            loop: false,
+            playInterval: playInterval * 2,
+            // left: null,
+            // right: 30,
+            // top: 330,
+            // bottom: 100,
+            // height: null,
+            label: {
+                normal: {
+                    show: true,
+                    interval: 0
+                }
+            },
+            symbol: 'none',
+            lineStyle: {
+                color: '#ccc',
+                show: false
+            },
+            checkpointStyle: {
+                symbol: 'none',
+                color: '#bbb',
+                borderColor: '#777',
+                show: false,
+                borderWidth: 1
+            },
+            controlStyle: {
+                showNextBtn: false,
+                showPrevBtn: false,
+                normal: {
+                    color: '#666',
+                    show: false,
+                    borderColor: '#666'
+                },
+                emphasis: {
+                    color: '#aaa',
+                    borderColor: '#aaa'
+                }
+            },
+            data: rankData.map(function(ele) {
+                return ele.date
+            })
+        },
+        // title: [{
+        //     left: 'center',
+        //     top: '3%',
+        //     textStyle: {
+        //         fontSize: 25,
+        //         color: 'rgba(121,121,121, 0.9)'
+        //     }
+        // }, {
+        //     left: 'center',
+        //     top: '5%'
+        // }],
+        grid: [{
+            left: '10%',
+            right: '10%',
+            top: '12%',
+            height: 'auto',
+            bottom: '10%'
+        }],
+        xAxis: [{
+
+        }],
+        yAxis: [{
+
+        }],
+        series: [{
+            id: 'bar',
+            type: 'bar',
+            barWidth: '20',
+            tooltip: {
+                show: false
+            },
+            label: {
+                normal: {
+                    show: true,
+                    position: 'right'
+                }
+            },
+            data: []
+        },{
+            id: 'bar1',
+            type: 'bar',
+            barWidth: '20',
+            tooltip: {
+                show: false
+            },
+            label: {
+                normal: {
+                    show: true,
+                    position: 'left'
+                }
+            },
+            data: []
+        }]
+    },
+    options: []
+  };
+
+
+  var guangdong = 238;
+  var zhejiang = 197;
+  var jiangsu = 165;
+  var anhui = 145;
+  var beijing = 107;
+  var shanghai = 80;
+  var tianjin = 80;
+
+  var index = 0;
+  setInterval(function () {
+    // rankData = [];
+    guangdong += parseInt(Math.random()*1000)
+    zhejiang += parseInt(Math.random()*1000)
+    jiangsu += parseInt(Math.random()*1000)
+    anhui += parseInt(Math.random()*1000)
+    beijing += parseInt(Math.random()*1000)
+    shanghai += parseInt(Math.random()*1000)
+    tianjin += parseInt(Math.random()*1000)
+
+
+    rankData.push({
+      'category': moment().format('YYYY-MM-DD-HH-mm-ss'),
+      'data': [
+          {
+              'name': '广东',
+              'value': guangdong
+          },
+          {
+              'name': '浙江',
+              'value': zhejiang
+          },
+          {
+              'name': '江苏',
+              'value': jiangsu
+          },
+
+          {
+              'name': '安徽',
+              'value': anhui
+          },
+
+          {
+              'name': '北京',
+              'value': beijing
+          },
+
+          {
+              'name': '上海',
+              'value': shanghai
+          },
+
+          {
+              'name': '天津',
+              'value': tianjin
+          } ],
+      'date': moment().format('YYYY-MM-DD-HH-mm-ss')
+    });
+
+    // console.log(rankData);
+
+    option.baseOption.timeline.data = rankData.map(function(ele) {
+        return ele.date
+    })
+    
+
+    var xMaxInterval = 5;
+
+    for (var i = 0; i < rankData.length; i++) {
+      var xMax = 20;
+      if (rankData[i].data[0].value > 20) {
+          xMax = 'dataMax'
+      }
+      if (rankData[i].data[0].value / xMaxInterval >= 10) {
+          xMaxInterval = parseInt(rankData[i].data[0].value / 5)
+      }
+
+
+      option.options.push({
+          xAxis: [{
+              show: true,
+              type: 'value',
+              interval: xMaxInterval,
+              max: xMax,
+              axisTick: {
+                  show: false
+              },
+              axisLabel: {
+                  show: true,
+                  color: 'rgba(121,121,121,0.9)',
+                  formatter: function(value, index) {
+                      // 空一格显示一次坐标值
+                      if (index % 2 === 0) {
+                          u = 0
+                          while (value > 100000 && u < 3) {
+                              value = Math.round(value / 10000);
+                              u = u + 1
+                          }
+                          return String(value) + unit[String(u)]
+                      } else {
+                          return '';
+                      }
+                  },
+                  textStyle: {
+                      color: 'rgba(121,121,121,0.9)'
+                  }
+              },
+              axisLine: {
+                  show: false,
+                  lineStyle: {
+                      color: 'rgba(121,121,121,0.3)'
+                  }
+              },
+              splitLine: {
+                  show: true,
+                  lineStyle: {
+                      color: ['rgba(121,121,121,0.3)', 'rgba(121,121,121,0)']
+                  }
+              }
+          }],
+          
+          
+          yAxis: [{
+              type: 'category',
+              inverse: true, // 反转
+
+              axisTick: {
+                  show: false
+              },
+              axisLine: {
+                  show: true,
+                  lineStyle: {
+                      color: 'rgba(121,121,121,0.3)'
+                  }
+              },
+              axisLabel: {
+                  show: false,
+                  textStyle: {}
+              },
+              // data: rankData[i].data.map(function(ele) {
+              //     return ele.name
+              // }).reverse()
+              data: rankData[i].data.sort(function(a, b) {
+                return a.value > b.value
+            }).map(function(ele) {
+                return ele.name
+              })
+          }],
+
+          series: [
+              {
+              id: 'bar',
+              itemStyle: {
+                  normal: {
+                      color: function(params) {
+                          var colorList = [
+                              '#7711AF', '#CF77FF', '#AE004F', '#F35872', '#FA7729',
+                              '#FFC526', '#F8E71C', '#34ADAE', '#3DDFD2', '#A0FFFF'
+                          ];
+                          var colorListr = [
+                              '#0f4471',
+                              '#00adb5',
+                              '#ff5722',
+                              '#5628b4',
+                              '#20BF55',
+                              '#f23557',
+                              '#118df0',
+                              '#11cbd7',
+                              '#d3327b',
+                              '#ae318a',
+                              '#993090',
+                              '#6f3071'
+                          ];
+                          return colorListr[params.dataIndex]
+                      },
+                      label: {
+                          show: true,
+                          position: 'top',
+                          formatter: '{c}%'
+                      },
+                      shadowBlur: 20,
+                      shadowColor: 'rgba(40, 40, 40, 0.5)',
+                  }
+              },
+              
+              label: {
+                  normal: {
+                      position: 'right',
+                      formatter: function(p) {
+                          return formatNum(p.value);
+                      }
+                  }
+              },
+
+              data: rankData[i].data.map(function(ele) {
+                  return ele.value
+              }).sort(function(a, b) {
+                  return a > b
+              })
+          },
+
+          {
+              id: 'bar1',
+              itemStyle: {
+                  normal: {
+                      color: function(params) {
+                          var colorList = [
+                              '#7711AF', '#CF77FF', '#AE004F', '#F35872', '#FA7729',
+                              '#FFC526', '#F8E71C', '#34ADAE', '#3DDFD2', '#A0FFFF'
+                          ];
+                          var colorListr = [
+                              '#0f4471',
+                              '#00adb5',
+                              '#ff5722',
+                              '#5628b4',
+                              '#20BF55',
+                              '#f23557',
+                              '#118df0',
+                              '#11cbd7',
+                              '#d3327b',
+                              '#ae318a',
+                              '#993090',
+                              '#6f3071'
+                          ];
+                          return colorListr[params.dataIndex]
+                      },
+                      label: {
+                          show: true,
+                          position: 'top',
+                          formatter: '{c}%'
+                      },
+                      shadowBlur: 20,
+                      shadowColor: 'rgba(40, 40, 40, 0.5)',
+                  }
+              },
+              barGap: '-100%',
+              label: {
+                  normal: {
+                      position: 'left',
+                      formatter: function(p) {
+                          return p.name;
+                      }
+                  }
+              },
+              data: rankData[i].data.map(function(ele) {
+                  return ele.value
+              }).sort(function(a, b) {
+                  return a > b
+              })
+          }
+          ]
+      })
+    }
+
+    index += 1;
+
+    // if (index === 10) {
+      // console.log('设定');
+      myChart.setOption(option);
+    // }
+
+  }, 1000);
+
+
+  // myChart.on('timelinechanged', function(timelineIndex) {
+  //   // 设置 每个series里的xAxis里的值
+  //   // var arrIndex = parseInt(timelineIndex.currentIndex);
+  //   // if (arrIndex == 5) // 这里 5可理解为timeline节点数组的长度,此处的目的是防止 5.xAxis not found
+  //   // arrIndex = 0
+  //   // option.options[arrIndex].xAxis.data=data[arrIndex];
+  //   // myChart.setOption(option);
+
+  //   console.log('timelineIndex', timelineIndex);
+  // });
+
+
+
+
+
+  // 3.把配置项给实例对象
+  myChart.setOption(option);
+
+  // 4.让图表随屏幕自适应
+  window.addEventListener('resize', function () {
+    myChart.resize();
+  })
 })();
 
 
@@ -128,15 +565,15 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
           //     return idx * 10;
           // },
           itemStyle: {
-              color: '#EB3B5A'
+              color: 'rgb(255, 70, 131)'
           },
           areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                   offset: 0,
-                  color: '#FE9C5A'
+                  color: 'rgb(255, 158, 68)'
               }, {
                   offset: 1,
-                  color: '#EB3B5A'
+                  color: 'rgb(255, 70, 131)'
               }])
           },
           data: data
@@ -144,7 +581,7 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
       ]
   };
 
-  function getDataAndRender() {
+  setInterval(function () {
     var url = isYSLD ? 'http://10.2.3.138:10036/getShopHourStatInfo' : 'http://10.2.3.138:10036/getAllHourStatInfo';
 
     $.ajax({
@@ -228,19 +665,12 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
         myChart.setOption(option);
       }
     });
-  }
-
-  // 首次加载
-  getDataAndRender();
-
-  // 定时器
-  setInterval(function () {
-    getDataAndRender();
-  }, 5000);
+  }, 2000);
 
   window.addEventListener('resize', function () {
     myChart.resize();
   })
+
 })();
 
 
@@ -412,7 +842,7 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
     ]
   };
 
-  function getDataAndRender() {
+  setInterval(function() {
     $.ajax({
       url: 'http://10.2.3.138:10036/getDangweiInfo',
       method:'POST',
@@ -451,22 +881,18 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
         myChart.setOption(option);
       },
     });
-  }
 
-  // 首次加载
-  getDataAndRender();
-
-  setInterval(function() {
-    getDataAndRender();
   }, 5000);
 
+
+  
   window.addEventListener('resize', function () {
     myChart.resize();
   })
 })();
 
 
-// 销售地图 和 订单来源
+// 销售地图
 (function () {
 
   var myChart = echarts.init(document.querySelector(".map .chart"));
@@ -540,6 +966,7 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
   var convertedData = convertData(data)
   console.log('convertedData', convertedData)
 
+
   var option = {
       tooltip: {
           formatter: function(e, t, n) {
@@ -564,7 +991,6 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
           seriesIndex: [1],
           inRange: {
               color: ['#467bc0', '#04387b'] // 蓝绿
-              // color: ['#2EC7CF', '#395CFE'] // 蓝绿 
           },
           textStyle: {
             "color": "#fff"
@@ -708,9 +1134,9 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
               },
               itemStyle: {
                   normal: {
-                      color: '#FA8231',
+                      color: 'yellow',
                       shadowBlur: 10,
-                      shadowColor: '#FA8231'
+                      shadowColor: 'yellow'
                   }
               },
               zlevel: 1
@@ -719,196 +1145,8 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
       ]
   };
 
+  setInterval(function() {
 
-  // 订单来源公用一个接口
-
-  // 1.实例化对象
-  var myChartRank = echarts.init(document.querySelector(".bar .chart"));
-  // 2.指定配置项和数据
-  
-  var attackSourcesColor = [
-    new echarts.graphic.LinearGradient(0, 1, 1, 1, [
-      { offset: 0, color: "#EB3B5A" },
-      { offset: 1, color: "#FE9C5A" }
-    ]),
-    new echarts.graphic.LinearGradient(0, 1, 1, 1, [
-      { offset: 0, color: "#FA8231" },
-      { offset: 1, color: "#FFD14C" }
-    ]),
-    new echarts.graphic.LinearGradient(0, 1, 1, 1, [
-      { offset: 0, color: "#F7B731" },
-      { offset: 1, color: "#FFEE96" }
-    ]),
-    new echarts.graphic.LinearGradient(0, 1, 1, 1, [
-      { offset: 0, color: "#395CFE" },
-      { offset: 1, color: "#2EC7CF" }
-    ])
-  ];
-
-  var attackSourcesColor1 = [
-    "#EB3B5A",
-    "#FA8231",
-    "#F7B731",
-    "#3860FC",
-    "#1089E7",
-    "#F57474",
-    "#56D0E3",
-    "#1089E7",
-    "#F57474",
-    "#1089E7",
-    "#F57474",
-    "#F57474"
-  ];
-
-  function attackSourcesDataFmt(sData) {
-    var sss = [];
-    sData.forEach(function(item, i) {
-      let itemStyle = {
-        color: i > 3 ? attackSourcesColor[3] : attackSourcesColor[i]
-      };
-      sss.push({
-        value: item,
-        itemStyle: itemStyle
-      });
-    });
-    return sss;
-  }
-
-  var optionRank = {
-    tooltip: {
-      show: false,
-      backgroundColor: "rgba(3,169,244, 0.5)", //背景颜色（此时为默认色）
-      textStyle: {
-        fontSize: 16
-      }
-    },
-    color: ["#F7B731"],
-    grid: {
-      left: "0",
-      right: "10",
-      // width:"80%",
-      bottom: "2%",
-      top: "10",
-      containLabel: true
-    },
-    xAxis: {
-      type: "value",
-      splitLine: {
-        show: false
-      },
-      axisLabel: {
-        show: false
-      },
-      axisTick: {
-        show: false
-      },
-      axisLine: {
-        show: false
-      }
-    },
-    yAxis: [
-      {
-        type: "category",
-        inverse: true,
-        axisLine: {
-          show: false
-        },
-        axisTick: {
-          show: false
-        },
-        axisPointer: {
-          label: {
-            show: true,
-            //margin: 30
-          }
-        },
-        pdaaing: [5, 0, 0, 0],
-        postion: "right",
-        data: [],
-        axisLabel: {
-          margin: 30,
-          fontSize: 12,
-          align: "left",
-          padding: [2, 0, 0, 0],
-          color: "#FFF",
-          rich: {
-            nt1: {
-              color: "#fff",
-              backgroundColor: attackSourcesColor1[0],
-              width: 13,
-              height: 13,
-              fontSize: 10,
-              align: "center",
-              borderRadius: 100,
-              lineHeight: "5",
-              padding: [0, 1, 2, 1]
-              // padding:[0,0,2,0],
-            },
-            nt2: {
-              color: "#fff",
-              backgroundColor: attackSourcesColor1[1],
-              width: 13,
-              height: 13,
-              fontSize: 10,
-              align: "center",
-              borderRadius: 100,
-              padding: [0, 1, 2, 1]
-            },
-            nt3: {
-              color: "#fff",
-              backgroundColor: attackSourcesColor1[2],
-              width: 13,
-              height: 13,
-              fontSize: 10,
-              align: "center",
-              borderRadius: 100,
-              padding: [0, 1, 2, 1]
-            },
-            nt: {
-              color: "#fff",
-              backgroundColor: attackSourcesColor1[3],
-              width: 13,
-              height: 13,
-              fontSize: 10,
-              align: "center",
-              lineHeight: 3,
-              borderRadius: 100,
-              padding: [0, 1, 2, 1],
-              lineHeight: 5
-            }
-          },
-          
-        }
-      },
-      
-    ],
-    series: [
-      {
-        zlevel: 1,
-        name: "销售单数",
-        type: "bar",
-        barWidth: "15px",
-        animationDuration: 1500,
-        data: [],
-        align: "center",
-        itemStyle: {
-          normal: {
-            barBorderRadius: 10
-          }
-        },
-        label: {
-          show: true,
-          fontSize: 10,
-          color: "#fff",
-          textBorderWidth: 2,
-          padding: [2, 0, 0, 0]
-        }
-      },
-    ]
-  };
-
-
-  function getDataAndRender(params) {
     $.ajax({
       url: 'http://10.2.3.138:10036/getTotalStatInfo',
       method:'POST',
@@ -951,43 +1189,25 @@ var shopName = isYSLD ? ysldShops.join(',') : 'all';
         option.series[3].data = convertData(data.sort(function(a, b) {
           return b.value - a.value;
         }).slice(0, 10));
-        myChart.setOption(option);
-
-
-
-        // console.log(option.series[3].data);
-        var attaData = [];
-        var attaName = [];
         
-        option.series[3].data.forEach(function(it, index) {
-          attaData[index] = parseFloat(it.value[2]);
-          attaName[index] = it.name;
-        });
-
-        optionRank.yAxis[0].data = attaName;
-        optionRank.series[0].data = attackSourcesDataFmt(attaData);
-
-        // 3.把配置项给实例对象
-        myChartRank.setOption(optionRank);
-
+        myChart.setOption(option);
       },
     });
-  }
-
-  // 首次加载
-  getDataAndRender();
-
-  setInterval(function() {
-    getDataAndRender();
   }, 5000);
 
-  // 4.让图表随屏幕自适应
+
   window.addEventListener('resize', function () {
     myChart.resize();
-    myChartRank.resize();
   });
+
 })();
 
+
+
+// 避免卡顿 每5分钟刷新一次
+setInterval(function() {
+  window.location.reload();
+}, 5 * 1000 * 60);
 
 
 
